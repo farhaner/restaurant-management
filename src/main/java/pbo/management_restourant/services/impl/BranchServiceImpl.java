@@ -25,6 +25,7 @@ public class BranchServiceImpl implements BranchService {
             branchModels.setBranchNoTelp(branchModels.getBranchNoTelp());
             branchModels.setBranchLocation(request.getBranchLocation());
             branchRepository.save(branchModels);
+            System.out.print(branchModels);
 
         } catch (Exception e) {
             e.printStackTrace();
