@@ -9,6 +9,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.ColumnDefault;
 
+import java.math.BigInteger;
 import java.time.LocalDate;
 
 @Entity
@@ -29,9 +30,8 @@ public class BranchModel {
     private String branchLocation;
 
     @Column(name = "BRANCH_NO_TELP", nullable = false, length = 15)
-    private int branchNoTelp;
+    private BigInteger branchNoTelp;
 
-    @ColumnDefault("curdate()")
     @Column(name = "BRANCH_CREATED_AT", nullable = false)
     private LocalDate branchCreatedAt;
 
