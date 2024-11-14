@@ -1,6 +1,7 @@
 package pbo.management_restourant.services.impl;
 
 import jakarta.transaction.Transactional;
+import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -13,6 +14,7 @@ import pbo.management_restourant.services.BranchService;
 
 import java.time.LocalDate;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -27,36 +29,40 @@ public class BranchServiceImpl implements BranchService {
     public CommonResponse addBranch(BranchRequest request) {
         CommonResponse response = new CommonResponse();
 
-        try {
-            Optional<BranchModel> branchId = branchRepository.findById(request.getBranchCode());
-            if (branchId.isPresent()) {
-                BranchModel branchModel = new BranchModel();
-                branchModel.setBranchId(request.getBranchCode());
-                branchModel.setBranchName(request.getBranchName());
-                branchModel.setBranchNoTelp(request.getNoTelp());
-                branchModel.setBranchLocation(request.getBranchAddres());
-                branchModel.setBranchCreatedAt(LocalDate.now());
-                branchRepository.save(branchModel);
+//        try {
+        Optional<BranchModel> getBranch = branchRepository.findById(request.getBranchCode());
+
+        if (getBranch.isEmpty()) {
+
+            BranchModel branchModel = new BranchModel();
+            branchModel.setBranchId(request.getBranchCode());
+            branchModel.setBranchName(request.getBranchName());
+            branchModel.setBranchNoTelp(request.getNoTelp());
+            branchModel.setBranchLocation(request.getBranchAddres());
+            branchModel.setBranchCreatedAt(LocalDate.now());
+            branchRepository.save(branchModel);
 
 
-                BranchResponse branchResponse = new BranchResponse();
-                branchResponse.setBranchCode(request.getBranchCode());
-                branchResponse.setBranchName(request.getBranchName());
-                branchResponse.setNoTelp(request.getNoTelp());
-                branchResponse.setStatus(request.getStatus());
-                branchResponse.setBranchAddres(request.getBranchAddres());
+            BranchResponse branchResponse = new BranchResponse();
+            branchResponse.setBranchCode(request.getBranchCode());
+            branchResponse.setBranchName(request.getBranchName());
+            branchResponse.setNoTelp(request.getNoTelp());
+            branchResponse.setStatus(request.getStatus());
+            branchResponse.setBranchAddres(request.getBranchAddres());
 
-                response.setData(branchResponse);
-                response.setMessage("New Branch Successfully added");
+//            branchResponse.setCreatedAt();
 
-            } else {
-                response.setData(request);
-                response.setMessage("Failed Add a New Branch ");
-            }
+            response.setData(branchResponse);
+            response.setMessage("New Branch Successfully added");
 
-        } catch (Exception e) {
-            log.error("Created Branch Failed: ", e);
+        } else {
+            response.setData(request);
+            response.setMessage("Failed Add a New Branch ");
         }
+
+//        } catch (Exception e) {
+//            log.error("Created Branch Failed: ", e);
+//        }
         return response;
     }
 
