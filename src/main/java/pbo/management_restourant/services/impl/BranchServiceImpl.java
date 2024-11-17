@@ -1,9 +1,9 @@
 package pbo.management_restourant.services.impl;
 
 import jakarta.transaction.Transactional;
-import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.coyote.BadRequestException;
 import org.springframework.stereotype.Service;
 import pbo.management_restourant.dto.request.BranchRequest;
 import pbo.management_restourant.dto.response.BranchResponse;
@@ -13,8 +13,6 @@ import pbo.management_restourant.repositories.BranchRepository;
 import pbo.management_restourant.services.BranchService;
 
 import java.time.LocalDate;
-import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -24,90 +22,123 @@ import java.util.Optional;
 public class BranchServiceImpl implements BranchService {
 
     private final BranchRepository branchRepository;
+    private static LocalDate LOCALDATE = LocalDate.now();
 
     @Transactional
     public CommonResponse addBranch(BranchRequest request) {
         CommonResponse response = new CommonResponse();
+        try {
+            validateBranchRequest(request);
+            Optional<BranchModel> getBranch = branchRepository.findById(request.getBranchCode());
+            if (getBranch.isEmpty()) {
 
-//        try {
-        Optional<BranchModel> getBranch = branchRepository.findById(request.getBranchCode());
+                BranchResponse branchResponse = new BranchResponse();
+                branchResponse.setBranchCode(request.getBranchCode());
+                branchResponse.setBranchName(request.getBranchName());
+                branchResponse.setNoTelp(request.getNoTelp());
+                branchResponse.setStatus(request.getStatus());
+                branchResponse.setBranchAddres(request.getBranchAddres());
+                branchResponse.setCreatedAt(LOCALDATE);
 
-        if (getBranch.isEmpty()) {
+                BranchModel branchModel = new BranchModel();
+                branchModel.setBranchId(request.getBranchCode());
+                branchModel.setBranchName(request.getBranchName());
+                branchModel.setBranchNoTelp(request.getNoTelp());
+                branchModel.setBranchLocation(request.getBranchAddres());
+                branchModel.setBranchCreatedAt(LOCALDATE);
+                branchModel.setBranchUpdatedAt(LOCALDATE);
+                branchRepository.save(branchModel);
 
-            BranchModel branchModel = new BranchModel();
-            branchModel.setBranchId(request.getBranchCode());
-            branchModel.setBranchName(request.getBranchName());
-            branchModel.setBranchNoTelp(request.getNoTelp());
-            branchModel.setBranchLocation(request.getBranchAddres());
-            branchModel.setBranchCreatedAt(LocalDate.now());
-            branchRepository.save(branchModel);
-
-
-            BranchResponse branchResponse = new BranchResponse();
-            branchResponse.setBranchCode(request.getBranchCode());
-            branchResponse.setBranchName(request.getBranchName());
-            branchResponse.setNoTelp(request.getNoTelp());
-            branchResponse.setStatus(request.getStatus());
-            branchResponse.setBranchAddres(request.getBranchAddres());
-
-//            branchResponse.setCreatedAt();
-
-            response.setData(branchResponse);
-            response.setMessage("New Branch Successfully added");
-
-        } else {
-            response.setData(request);
-            response.setMessage("Failed Add a New Branch ");
+                response.setData(branchResponse);
+                response.setMessage("New Branch Successfully added");
+            } else {
+                response.setData(request);
+                response.setMessage("Branch already exists");
+            }
+        } catch (IllegalArgumentException | BadRequestException ex) {
+            response.setMessage(ex.getMessage());
+            response.setData(null);
         }
-
-//        } catch (Exception e) {
-//            log.error("Created Branch Failed: ", e);
-//        }
-        return response;
-    }
-
-//    @Override
-//    public List<CommonResponse> findByKeyword(String keyword) {
-//        List<BranchResponse> getBranchByKeyword = branchRepository.findByKeyword(keyword);
-//
-//        CommonResponse response = new CommonResponse();
-//
-//        response.setData(getBranchByKeyword);
-//        response.setMessage("Found " + getBranchByKeyword.size() + " branches");
-//
-//        return Collections.singletonList(response);
-//    }
-
-    @Override
-    public CommonResponse getBranchById(String id) {
-        CommonResponse response = new CommonResponse();
-
-        Optional<BranchModel> getBranch = branchRepository.findById(id);
-//        if (getBranch != null) {
-        response.setData(getBranch);
-        response.setMessage("Branch Successfully retrieved");
-//        } else {
-//            response.setData(null);
-//            response.setMessage("Failed Retrieving Branch");
-//        }
         return response;
     }
 
     @Override
-    public List<CommonResponse> getAllBranch() {
+    public CommonResponse getAllBranch() {
         CommonResponse response = new CommonResponse();
 
-        List<BranchModel> allBranch = branchRepository.findAll();
+        List<BranchModel> allListBranch = branchRepository.findAll();
+        if (allListBranch.isEmpty()) {
+            response.setData(null);
+            response.setMessage("No Branch Found");
+        }
+        response.setData(allListBranch);
+        response.setMessage("All Branches successfully retrieved");
 
-        response.setData(allBranch);
-        response.setMessage("All Branch Successfully retrieved");
-
-        return Collections.singletonList(response);
+        return response;
     }
 
-    public CommonResponse updateBranch(BranchRequest request) {
+    @Override
+    public CommonResponse getAllBranchByKeyword(String keyword) {
         CommonResponse response = new CommonResponse();
-        return null;
+        if (keyword == null || keyword.trim().isEmpty()) {
+            List<BranchModel> allBranchByKeyword = branchRepository.getAllBranchByKeyword(keyword);
+
+            if (allBranchByKeyword.isEmpty()) {
+                response.setData(null);
+                response.setMessage("Branch not found");
+            } else {
+                response.setData(allBranchByKeyword);
+                response.setMessage("All Branches successfully retrieved for keyword: " + keyword);
+            }
+        }
+        response.setData(null);
+        response.setMessage("Please enter the keyword");
+
+        return response;
+    }
+
+    @Transactional
+    @Override
+    public CommonResponse updatedBranchById(BranchRequest request) throws BadRequestException {
+        CommonResponse response = new CommonResponse();
+        try {
+            if (request.getBranchCode() == null || request.getBranchCode().isEmpty()) {
+                throw new BadRequestException("Branch Code cannot be null or empty");
+            }
+            if (request.getNoTelp() == null || request.getNoTelp().isEmpty() || request.getNoTelp().length() > 15) {
+                throw new BadRequestException("NoTelp cannot be null, empty and longer than 15 characters");
+            }
+
+            Optional<BranchModel> getId = branchRepository.findById(request.getBranchCode());
+            if (getId.isPresent()) {
+
+                Object[] updateBranch = branchRepository.updateBranch(
+                        request.getBranchCode(),
+                        request.getBranchAddres(),
+                        request.getBranchName(),
+                        request.getNoTelp(),
+                        request.getStatus()
+                );
+
+                if (updateBranch != null) {
+                    response.setData(updateBranch[0]);
+                    response.setMessage("Branch Successfully updated");
+                } else {
+                    response.setData(null);
+                    response.setMessage("Branch update failed");
+                }
+            } else {
+                response.setData(null);
+                response.setMessage("Branch with the given code not found");
+            }
+        } catch (BadRequestException ex) {
+            response.setData(null);
+            response.setMessage(ex.getMessage());
+        } catch (Exception ex) {
+            response.setData(null);
+            response.setMessage("An unexpected error occurred: " + ex.getMessage());
+        }
+        return response;
     }
 
     @Override
@@ -125,4 +156,26 @@ public class BranchServiceImpl implements BranchService {
         }
         return response;
     }
+
+    private void validateBranchRequest(BranchRequest request) throws BadRequestException {
+        if (request == null) {
+            throw new BadRequestException("Request cannot be null");
+        }
+        if (request.getBranchCode() == null || request.getBranchCode().isEmpty()) {
+            throw new BadRequestException("Branch Code cannot be null or empty");
+        }
+        if (request.getBranchName() == null || request.getBranchName().isEmpty()) {
+            throw new BadRequestException("Branch Name cannot be null or empty");
+        }
+        if (request.getBranchAddres() == null || request.getBranchAddres().isEmpty()) {
+            throw new BadRequestException("Branch Address cannot be null or empty");
+        }
+        if (request.getNoTelp() == null || request.getNoTelp().isEmpty() || request.getNoTelp().length() > 15) {
+            throw new BadRequestException("NoTelp cannot be null, empty and longer than 15 characters");
+        }
+        if (request.getStatus() == null || request.getStatus().isEmpty()) {
+            throw new BadRequestException("Status cannot be null or empty");
+        }
+    }
+
 }

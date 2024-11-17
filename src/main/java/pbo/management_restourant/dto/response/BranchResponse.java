@@ -1,17 +1,19 @@
 package pbo.management_restourant.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 
-import java.math.BigInteger;
-import java.util.Date;
+import java.time.LocalDate;
 
 @Data
+@JsonIgnoreProperties
 public class BranchResponse {
 
     private String branchCode;
     private String branchName;
     private String branchAddres;
-    private BigInteger noTelp;
+    private String noTelp;
     private String status;
-    private Date createdAt;
+    private LocalDate createdAt;
+    private LocalDate updatedAt;
 }
