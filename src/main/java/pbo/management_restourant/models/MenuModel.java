@@ -20,6 +20,7 @@ public class MenuModel {
 
     @Id
     @Column(name = "MENU_CODE", nullable = false, length = 32)
+<<<<<<< HEAD
     private String menuCode;
 
     @Column(name = "MENU_NAME", nullable = false, length = 50)
@@ -29,5 +30,16 @@ public class MenuModel {
     private String category;
 
     @Column(name = "AMOUNT", nullable = false)
+=======
+    private int menuCode;
+
+    @Column(name = "MENU_NAME", nullable = false, length = 100)
+    private String menuName;
+
+    @Column(name = "CATEGORY", nullable = false, length = 150)
+    private String category;
+
+    @Column(name = "AMOUNT", nullable = false, length = 15)
+>>>>>>> 4bd820189af804fb467779dc48a2d731f8da08ae
     private int amount;
 }

@@ -35,6 +35,7 @@ public class BranchServiceImpl implements BranchService {
             if (getBranch.isEmpty()) {
                 BranchModel branchModel = new BranchModel();
 
+<<<<<<< HEAD
                 branchModel.setBranchId(request.getBranchCode());
                 branchModel.setBranchName(request.getBranchName());
                 branchModel.setBranchNoTelp(request.getNoTelp());
@@ -43,6 +44,15 @@ public class BranchServiceImpl implements BranchService {
                 branchModel.setStatus(request.getStatus());
                 branchModel.setBranchUpdatedAt(LOCALDATE);
                 branchRepository.save(branchModel);
+=======
+            BranchModel branchModels = new BranchModel();
+            branchModels.setBranchId(String.valueOf(UUID.randomUUID()));
+            branchModels.setBranchName(request.getBranchName());
+            branchModels.setBranchNoTelp(branchModels.getBranchNoTelp());
+            branchModels.setBranchLocation(request.getBranchLocation());
+            branchRepository.save(branchModels);
+            System.out.print("fuck");
+>>>>>>> 4bd820189af804fb467779dc48a2d731f8da08ae
 
                 branchResponse.setBranchCode(request.getBranchCode());
                 branchResponse.setBranchName(request.getBranchName());
