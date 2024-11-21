@@ -31,6 +31,9 @@ public class BranchModel {
     @Column(name = "BRANCH_NO_TELP", nullable = false, length = 15)
     private String branchNoTelp;
 
+    @Column(name = "STATUS", nullable = false, length = 15)
+    private String status;
+
     @Column(name = "BRANCH_CREATED_AT", nullable = false)
     private LocalDate branchCreatedAt;
 

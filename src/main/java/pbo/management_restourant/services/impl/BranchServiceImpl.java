@@ -25,14 +25,25 @@ public class BranchServiceImpl implements BranchService {
     private static LocalDate LOCALDATE = LocalDate.now();
 
     @Transactional
+    @Override
     public CommonResponse addBranch(BranchRequest request) {
         CommonResponse response = new CommonResponse();
         try {
+            BranchResponse branchResponse = new BranchResponse();
             validateBranchRequest(request);
             Optional<BranchModel> getBranch = branchRepository.findById(request.getBranchCode());
             if (getBranch.isEmpty()) {
+                BranchModel branchModel = new BranchModel();
 
-                BranchResponse branchResponse = new BranchResponse();
+                branchModel.setBranchId(request.getBranchCode());
+                branchModel.setBranchName(request.getBranchName());
+                branchModel.setBranchNoTelp(request.getNoTelp());
+                branchModel.setBranchLocation(request.getBranchAddres());
+                branchModel.setBranchCreatedAt(LOCALDATE);
+                branchModel.setStatus(request.getStatus());
+                branchModel.setBranchUpdatedAt(LOCALDATE);
+                branchRepository.save(branchModel);
+
                 branchResponse.setBranchCode(request.getBranchCode());
                 branchResponse.setBranchName(request.getBranchName());
                 branchResponse.setNoTelp(request.getNoTelp());
@@ -40,19 +51,17 @@ public class BranchServiceImpl implements BranchService {
                 branchResponse.setBranchAddres(request.getBranchAddres());
                 branchResponse.setCreatedAt(LOCALDATE);
 
-                BranchModel branchModel = new BranchModel();
-                branchModel.setBranchId(request.getBranchCode());
-                branchModel.setBranchName(request.getBranchName());
-                branchModel.setBranchNoTelp(request.getNoTelp());
-                branchModel.setBranchLocation(request.getBranchAddres());
-                branchModel.setBranchCreatedAt(LOCALDATE);
-                branchModel.setBranchUpdatedAt(LOCALDATE);
-                branchRepository.save(branchModel);
-
                 response.setData(branchResponse);
                 response.setMessage("New Branch Successfully added");
             } else {
-                response.setData(request);
+                branchResponse.setBranchCode(request.getBranchCode());
+                branchResponse.setBranchName(request.getBranchName());
+                branchResponse.setNoTelp(request.getNoTelp());
+                branchResponse.setStatus(request.getStatus());
+                branchResponse.setBranchAddres(request.getBranchAddres());
+                branchResponse.setCreatedAt(LOCALDATE);
+
+                response.setData(branchResponse);
                 response.setMessage("Branch already exists");
             }
         } catch (IllegalArgumentException | BadRequestException ex) {
@@ -81,18 +90,19 @@ public class BranchServiceImpl implements BranchService {
     public CommonResponse getAllBranchByKeyword(String keyword) {
         CommonResponse response = new CommonResponse();
         if (keyword == null || keyword.trim().isEmpty()) {
-            List<BranchModel> allBranchByKeyword = branchRepository.getAllBranchByKeyword(keyword);
-
-            if (allBranchByKeyword.isEmpty()) {
-                response.setData(null);
-                response.setMessage("Branch not found");
-            } else {
-                response.setData(allBranchByKeyword);
-                response.setMessage("All Branches successfully retrieved for keyword: " + keyword);
-            }
+            response.setData(null);
+            response.setMessage("Please enter the keyword");
         }
-        response.setData(null);
-        response.setMessage("Please enter the keyword");
+
+        List<BranchModel> allBranchByKeyword = branchRepository.getAllBranchByKeyword(keyword);
+        if (allBranchByKeyword.isEmpty()) {
+            response.setData(null);
+            response.setMessage("Branch not found");
+        } else {
+            response.setData(allBranchByKeyword);
+            response.setMessage("All Branches successfully retrieved for keyword: " + keyword);
+        }
+
 
         return response;
     }
