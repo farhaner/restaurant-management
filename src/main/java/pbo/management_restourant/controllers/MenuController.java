@@ -45,6 +45,6 @@ public class MenuController {
 
     @DeleteMapping(value = "/{code}")
     public CommonResponse deleteMenu(@PathVariable String code) {
-        return menuService.deleteMenuByCode(code);
+        return menuService.deleteMenuByCode(code); 
     }
 }
