@@ -1,21 +1,18 @@
 package pbo.management_restourant.services;
 
+import org.apache.coyote.BadRequestException;
 import pbo.management_restourant.dto.request.BranchRequest;
 import pbo.management_restourant.dto.response.CommonResponse;
-
-import java.util.List;
 
 public interface BranchService {
 
     CommonResponse addBranch(BranchRequest request);
 
-//    List<CommonResponse> findByKeyword(String keyword);
+    CommonResponse getAllBranch();
 
-    CommonResponse getBranchById(String id);
+    CommonResponse getAllBranchByKeyword(String keyword);
 
-    List<CommonResponse> getAllBranch();
-
-    CommonResponse updateBranch(BranchRequest request);
+    CommonResponse updatedBranchById(BranchRequest request) throws BadRequestException;
 
     CommonResponse deleteBranchById(String id);
 }
