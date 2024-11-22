@@ -57,15 +57,8 @@ public class EmployeeServiceImpl implements EmployeeService {
                 response.setData(employeeResponse);
                 response.setMessage("New Employee Successfully added");
             } else {
-                employeeResponse.setId(request.getId());
-                employeeResponse.setName(request.getName());
-                employeeResponse.setPosition(request.getPosition());
-                employeeResponse.setSalary(request.getSalary());
-                employeeResponse.setStatus(request.getStatus());
-                employeeResponse.setJoinedDate(LOCALDATE);
-                employeeResponse.setCreatedAt(LOCALDATE);
 
-                response.setData(employeeResponse);
+                response.setData(null);
                 response.setMessage("Employee already exists");
             }
         } catch (IllegalArgumentException | BadRequestException ex) {

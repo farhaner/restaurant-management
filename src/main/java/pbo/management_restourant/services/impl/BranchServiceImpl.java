@@ -92,18 +92,16 @@ public class BranchServiceImpl implements BranchService {
         if (keyword == null || keyword.trim().isEmpty()) {
             response.setData(null);
             response.setMessage("Please enter the keyword");
-        }
-
-        List<BranchModel> allBranchByKeyword = branchRepository.getAllBranchByKeyword(keyword);
-        if (allBranchByKeyword.isEmpty()) {
-            response.setData(null);
-            response.setMessage("Branch not found");
         } else {
-            response.setData(allBranchByKeyword);
-            response.setMessage("All Branches successfully retrieved for keyword: " + keyword);
+            List<BranchModel> allBranchByKeyword = branchRepository.getAllBranchByKeyword(keyword);
+            if (allBranchByKeyword.isEmpty()) {
+                response.setData(null);
+                response.setMessage("Branch not found");
+            } else {
+                response.setData(allBranchByKeyword);
+                response.setMessage("All Branches successfully retrieved for keyword: " + keyword);
+            }
         }
-
-
         return response;
     }
 
