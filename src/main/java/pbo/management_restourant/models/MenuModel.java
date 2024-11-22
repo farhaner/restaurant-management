@@ -1,14 +1,13 @@
 package pbo.management_restourant.models;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 
 @Entity
@@ -40,4 +39,9 @@ public class MenuModel {
     @Column(name = "MENU_UPDATED_AT", nullable = false)
     private LocalDate updatedAt;
 
+    @OneToMany(mappedBy = "menu", cascade = CascadeType.ALL)
+    private List<TransactionModel> transactions = new ArrayList<>();
+
+//    @ManyToMany(mappedBy = "menu")menu
+//    private List<TransactionModel> transactions = new ArrayList<>();
 }
